@@ -1,7 +1,7 @@
 import pytest
 from datetime import date, timedelta
 
-from batches_domain import Batch, OrderLine, allocate, OutOfStock
+from domain import Batch, OrderLine, allocate, OutOfStock
 
 
 def test_current_batch_and_shipment():

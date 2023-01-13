@@ -1,5 +1,6 @@
-from batches_domain import Batch, OrderLine
+
 from datetime import date, timedelta
+from domain import Batch, OrderLine
 
 
 def make_batch_and_order_line(sku: str, batch_qty: int, order_line_qty: int):
