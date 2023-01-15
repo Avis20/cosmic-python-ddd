@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, clear_mappers
 
-from orm import metadata, start_mapper
+from src.app.model import metadata, start_mapper
 
 
 @pytest.fixture
@@ -15,7 +15,6 @@ def db_in_memory():
 
 @pytest.fixture
 def session(db_in_memory) -> Session:
-    # assert 1 == 2
     start_mapper()
     Session = sessionmaker(bind=db_in_memory)
     session = Session()

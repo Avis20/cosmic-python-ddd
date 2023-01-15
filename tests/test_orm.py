@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import select, text
 
-from domain import OrderLine
+from src.app.domain import OrderLine
 
 
 def test_insert_and_check_order_lines(session: Session):

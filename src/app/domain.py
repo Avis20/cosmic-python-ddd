@@ -24,7 +24,15 @@ class Batch:
     # eta - предполагаемый срок прибытия
     eta: Optional[date] = None
     # словарь товарных позиций
-    _allocated_order_lines: Set[OrderLine] = field(default_factory=set)
+    _allocations: Set[OrderLine] = field(default_factory=set)
+
+    def __eq__(self, other):
+        if isinstance(other, Batch):
+            return self.number == other.number
+        return NotImplemented
+
+    # def __hash__(self):
+    #     return hash(self.number)
 
     def __gt__(self, other):
         if isinstance(other, Batch):
@@ -38,16 +46,16 @@ class Batch:
     def allocate(self, order_line: OrderLine):
         """Размещение товара в партии"""
         if self.can_allocate(order_line):
-            self._allocated_order_lines.add(order_line)
+            self._allocations.add(order_line)
 
     def deallocate(self, order_line: OrderLine):
         """Отмена заказа - возвращаем размещенный заказ обратно в партию"""
-        if order_line in self._allocated_order_lines:
-            self._allocated_order_lines.remove(order_line)
+        if order_line in self._allocations:
+            self._allocations.remove(order_line)
 
     @property
     def allocated_quantity(self) -> int:
-        return sum(line.qty for line in self._allocated_order_lines)
+        return sum(line.qty for line in self._allocations)
 
     @property
     def available_quantity(self) -> int:
