@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, clear_mappers
 from src.app.model import metadata, start_mapper
 
 
-@pytest.fixture
+@pytest.fixture()
 def db_in_memory():
     engine = create_engine("sqlite:///:memory:")
     metadata.create_all(engine)

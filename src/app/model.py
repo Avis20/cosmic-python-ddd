@@ -1,3 +1,6 @@
+
+import loguru
+
 from sqlalchemy import (
     MetaData,
     Table,
