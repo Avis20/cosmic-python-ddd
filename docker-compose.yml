@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db-cosmic
+    env_file: .docker.env
+    volumes:
+      - ./src:/src
+      - ./tests:/tests
+    ports:
+      - 80:5000
+    
+  db-cosmic:
+    image: postgres:13
+    restart: unless-stopped
+    env_file: .docker.env
+    ports:
+      - 15432:5432
