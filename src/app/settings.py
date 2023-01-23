@@ -1,3 +1,4 @@
+# ./src/app/settings.py
 from pydantic import BaseSettings
 
 
@@ -14,7 +15,7 @@ class Settings(BaseSettings):
     @property
     def get_postgres_uri(self):
         return (
-            f"postgres://{self.DB_NAME}:{self.DB_PASS}@"
+            f"postgresql://{self.DB_USER}:{self.DB_PASS}@"
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
@@ -23,5 +24,5 @@ class Settings(BaseSettings):
         return f"http://{self.API_HOST}:{self.API_PORT}"
 
 
-def get_settings():
+def get_settings() -> Settings:
     return Settings()

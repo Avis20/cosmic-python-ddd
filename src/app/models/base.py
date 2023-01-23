@@ -1,5 +1,4 @@
-
-import loguru
+# ./src/app/models/base.py
 
 from sqlalchemy import (
     MetaData,
@@ -11,10 +10,9 @@ from sqlalchemy import (
     ForeignKey,
     ForeignKeyConstraint,
 )
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import registry, relationship
 
-from src.app.domain import OrderLine, Batch
+from app.domain import OrderLine, Batch
 
 
 metadata = MetaData()

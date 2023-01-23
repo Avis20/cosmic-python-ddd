@@ -1,6 +1,6 @@
 FROM python:3.10-alpine
 
-RUN apk add curl htop
+RUN apk add curl htop postgresql-contrib
 
 COPY ./pyproject.toml .
 RUN pip install poetry

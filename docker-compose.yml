@@ -1,23 +1,42 @@
 version: "3.8"
 services:
 
-  app:
+  cosmic-app:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
-      - db-cosmic
+      - cosmic-db
     env_file: .docker.env
     volumes:
       - ./src:/src
       - ./tests:/tests
     ports:
-      - 80:5000
-    
-  db-cosmic:
+      - 5000:5000
+    networks:
+      local:
+        ipv4_address: "192.168.201.1"
+
+  cosmic-db:
     image: postgres:13
     restart: unless-stopped
     env_file: .docker.env
     ports:
-      - 15432:5432
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data/
+    networks:
+      local:
+        ipv4_address: "192.168.201.2"
+
+volumes:
+  db:
+
+networks:
+  local:
+    name: cosmic_network
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.201.0/20"

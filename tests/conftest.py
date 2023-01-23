@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, clear_mappers
 
-from src.app.model import metadata, start_mapper
+from app.models.base import metadata, start_mapper
 
 
 @pytest.fixture()

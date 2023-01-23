@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import select
 
-from src.app.domain import Batch
+from app.domain import Batch
 
 
 class BaseRepository(ABC):
@@ -40,3 +40,6 @@ class BatchRepository(BaseRepository):
         # stmt = select(Batch).filter_by(number=number)
         # row = self.session.execute(stmt).fetchone()
         return self.session.query(Batch).filter_by(number=number).one()
+
+    def list(self):
+        return self.session.query(Batch).all()
