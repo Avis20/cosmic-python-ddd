@@ -1,5 +1,7 @@
 from datetime import date, timedelta
-from app.domain import Batch, OrderLine
+
+from app.core.batch.domain import BatchDomain
+from app.core.order_lines.domain import OrderLineDomain
 
 
 def make_batch_and_order_line(sku: str, batch_qty: int, order_line_qty: int):
@@ -7,8 +9,8 @@ def make_batch_and_order_line(sku: str, batch_qty: int, order_line_qty: int):
     Создание партии и товарной позиции
     """
     return (
-        Batch("batch-001", sku=sku, qty=batch_qty),
-        OrderLine("order_line-001", sku=sku, qty=order_line_qty),
+        BatchDomain("batch-001", sku=sku, qty=batch_qty),
+        OrderLineDomain("order_line-001", sku=sku, qty=order_line_qty),
     )
 
 
@@ -41,8 +43,8 @@ def test_can_allocate_if_available_equals_required():
 
 
 def test_cannot_allocate_if_sku_not_match():
-    batch = Batch("batch-001", "BIG-LAMP", 10)
-    order_line = OrderLine("order_line-001", "LARGE-TABLE", 10)
+    batch = BatchDomain("batch-001", "BIG-LAMP", 10)
+    order_line = OrderLineDomain("order_line-001", "LARGE-TABLE", 10)
 
     assert batch.can_allocate(order_line) is False
 
@@ -62,9 +64,9 @@ def test_allocate_is_idempotent():
 
 
 def test_order_batches_by_eta():
-    batch_in_stock = Batch("batch-in-stock", "RETRO-CLOCK", qty=100, eta=date.today())
+    batch_in_stock = BatchDomain("batch-in-stock", "RETRO-CLOCK", qty=100, eta=date.today())
     tomorrow = date.today() + timedelta(days=1)
-    batch_in_shipment = Batch("batch-in-shipment", "RETRO-CLOCK", qty=100, eta=tomorrow)
+    batch_in_shipment = BatchDomain("batch-in-shipment", "RETRO-CLOCK", qty=100, eta=tomorrow)
 
     batches = sorted([batch_in_shipment, batch_in_stock])
     assert batches[0] == batch_in_stock and batches[1] == batch_in_shipment

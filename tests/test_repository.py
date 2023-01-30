@@ -1,13 +1,16 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from app.domain import Batch, OrderLine
-from app.repository import BatchRepository
+
+from app.core.batch.domain import BatchDomain
+from app.core.order_lines.domain import OrderLineDomain
+
+from app.core.batch.repositories import BatchRepository
 
 
 def test_can_save_batch(session: Session):
     row = ("batch-1", "СТОЛ", 10, None)
-    batch = Batch(*row)
+    batch = BatchDomain(*row)
 
     repo = BatchRepository(session=session)
     repo.add(batch)
@@ -63,11 +66,11 @@ def test_can_retrieve_bath_with_allocation(session: Session):
     if not batch_in_db:
         raise Exception("Not Found")
 
-    expected_batch = Batch("batch-1", "SOME", 10)
+    expected_batch = BatchDomain("batch-1", "SOME", 10)
 
     # Сравниваются только number
     assert batch_in_db == expected_batch
 
     assert batch_in_db.sku == expected_batch.sku
     assert batch_in_db.eta == expected_batch.eta
-    assert batch_in_db._allocations == {OrderLine("order-1", "SOME", 2)}
+    assert batch_in_db._allocations == {OrderLineDomain("order-1", "SOME", 2)}

@@ -3,6 +3,9 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+
+    LOG_LEVEL: str = 'INFO'
+
     DB_HOST: str = 'localhost'
     DB_PORT: int = 5432
     DB_PASS: str = 'cosmic-pass'

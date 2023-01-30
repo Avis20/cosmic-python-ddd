@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import select, text
 
-from app.domain import OrderLine
+from app.core.order_lines.domain import OrderLineDomain
 
 
 def test_insert_and_check_order_lines(session: Session):
     session.execute(
         text(
-            'INSERT INTO order_lines ("order_id", "sku", qty) VALUES'
+            'INSERT INTO order_lines ("order_id", "sku", qty) VALUES '
             '("order-1", "СТУЛ", 12),'
             '("order-1", "СТОЛ", 10),'
             '("order-1", "ХЛЕБ", 1);'
@@ -15,16 +15,16 @@ def test_insert_and_check_order_lines(session: Session):
     )
 
     expected = [
-        (OrderLine("order-1", "СТУЛ", 12),),
-        (OrderLine("order-1", "СТОЛ", 10),),
-        (OrderLine("order-1", "ХЛЕБ", 1),),
+        (OrderLineDomain("order-1", "СТУЛ", 12),),
+        (OrderLineDomain("order-1", "СТОЛ", 10),),
+        (OrderLineDomain("order-1", "ХЛЕБ", 1),),
     ]
-    assert session.execute(select(OrderLine)).fetchall() == expected
+    assert session.execute(select(OrderLineDomain)).fetchall() == expected
 
 
 def test_add_order_lines_and_select(session: Session):
     row = ("order-1", "СТОЛ", 3)
-    order_line = OrderLine(*row)
+    order_line = OrderLineDomain(*row)
     session.add(order_line)
     session.commit()
 
