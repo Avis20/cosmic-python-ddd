@@ -1,4 +1,3 @@
-
 import pytest
 from uuid import uuid4
 
@@ -30,6 +29,7 @@ def test_read_main():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello Cosmic"}
+
 
 @pytest.mark.skip("Запускать с postgres БД")
 def test_happy_allocate_batches(add_stock):
