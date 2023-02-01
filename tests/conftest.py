@@ -31,8 +31,8 @@ def session(db_in_memory) -> Session:
 
 @pytest.fixture
 def add_stock(session: Session):
-    batches = set()
-    order_lines = set()
+    batches_added = set()
+    sku_added = set()
 
     def _add_stock(lines):
         for batch, sku, qty, eta in lines:
@@ -41,7 +41,8 @@ def add_stock(session: Session):
                 'VALUES (:number, :sku, :qty, :eta) RETURNING id',
                 dict(number=batch, sku=sku, qty=qty, eta=eta)
             )
-            batches.add(batch_id)
+            batches_added.add(batch_id)
+            sku_added.add(sku)
         session.commit()
 
     yield _add_stock
@@ -49,11 +50,17 @@ def add_stock(session: Session):
     print('\n\n')
     print('CLEAN')
     print('\n\n')
+    # return
 
-    for batch_id in batches:
+    for batch_id in batches_added:
         session.execute(
             'DELETE FROM allocations WHERE batch_id = :batch_id', dict(batch_id=batch_id)
         )
         session.execute(
             'DELETE FROM batches WHERE id = :batch_id', dict(batch_id=batch_id)
         )
+    for sku in sku_added:
+        session.execute(
+            'DELETE FROM order_lines WHERE sku = :sku', dict(sku=sku)
+        )
+

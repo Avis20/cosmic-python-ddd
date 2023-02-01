@@ -28,6 +28,8 @@ def allocate(
     batch_repository = BatchRepository(db_session)
     line = OrderLineDomain(**order_line.dict())
     try:
-        services.allocate(line, batch_repository, db_session)
+        batch_number = services.allocate(line, batch_repository, db_session)
     except (BatchException.OutOfStock, BatchException.InvalidSku) as error:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail={"error": str(error)})
+    
+    return {"batch_name": batch_number}

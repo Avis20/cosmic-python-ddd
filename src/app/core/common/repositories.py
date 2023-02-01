@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Any, List
 
 
-class BaseRepository(ABC):
+class AbstractRepository(ABC):
     def add(self):
         raise NotImplementedError
 

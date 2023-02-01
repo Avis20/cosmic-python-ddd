@@ -1,13 +1,21 @@
 .DEFAULT_GOAL := help
 
+
 .PHONY: up
 up: ## Up all services locally with docker-compose
 	touch .docker.env
 	docker-compose up --build --no-log-prefix
 
+
 .PHONY: uninstall
 uninstall: ## Complete remove containers and named volumes
 	docker-compose down --remove-orphans --volumes
+
+
+.PHONY: clean-python
+clean-python: ## Remove pycache
+	bash -c 'find . | grep -E "(/__pycache__$|\.pyc$|\.pyo$)" | xargs rm -rf'
+
 
 .PHONY: help
 help: ## Help
