@@ -1,11 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-
-from sqlalchemy.orm import Session
-
-from app.models.db import get_session
-from app.core.batch.repositories import BatchRepository
+from fastapi import APIRouter, HTTPException, status
 
 from app.core.batch.domain import BatchException
+
+from app.core.batch.uow import BatchUnitOfWork
 
 from app.schemas.request.order_lines import OrderLineSchema
 from app.schemas.request.batches import BatchAddSchema
@@ -23,13 +20,10 @@ def root():
 @router.post('/allocate')
 def allocate(
     order_line: OrderLineSchema,
-    db_session: Session = Depends(get_session),
 ):
-    batch_repository = BatchRepository(db_session)
+    uow = BatchUnitOfWork()
     try:
-        batch_number = services.allocate(
-            **order_line.dict(), repository=batch_repository, db_session=db_session
-        )
+        batch_number = services.allocate(**order_line.dict(), uow=uow)
     except (BatchException.OutOfStock, BatchException.InvalidSku) as error:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail={"error": str(error)})
 
@@ -39,8 +33,7 @@ def allocate(
 @router.post('/batch/add')
 def add_batch(
     batch: BatchAddSchema,
-    db_session: Session = Depends(get_session),
 ):
-    batch_repository = BatchRepository(db_session)
-    services.add_batch(**batch.dict(), repository=batch_repository, db_session=db_session)
+    uow = BatchUnitOfWork()
+    services.add_batch(**batch.dict(), uow=uow)
     return {"success": 1}

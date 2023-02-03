@@ -12,11 +12,11 @@ settings = get_settings()
 metadata = MetaData()
 engine = create_engine(settings.get_postgres_uri, echo=True)
 
-sync_session = sessionmaker(bind=engine, autocommit=False, autoflush=True)
+session_factory = sessionmaker(bind=engine, autocommit=False, autoflush=True)
 
 
 def get_session() -> Generator:
-    with sync_session() as session:
+    with session_factory() as session:
         try:
             yield session
             session.commit()

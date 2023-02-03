@@ -3,7 +3,7 @@ from typing import Any, List
 
 
 class AbstractRepository(ABC):
-    def add(self):
+    def add(self, reference: Any):
         raise NotImplementedError
 
     def get(self, reference: Any):

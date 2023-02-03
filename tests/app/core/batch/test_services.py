@@ -1,21 +1,43 @@
 import pytest
 from datetime import date, timedelta
 
-from app.core.order_lines.domain import OrderLineDomain
-from app.core.batch.domain import BatchDomain
-from app.core.batch.repositories import FakeBatchRepository
+from app.core.common.repositories import AbstractRepository
+from app.core.common.uow import AbstractUnitOfWork
 from app.core.batch import services
 from app.core.batch.exceptions import BatchException
 
 
-class FakeSession:
-    committed = False
+class FakeBatchRepository(AbstractRepository):
+    def __init__(self, batches):
+        self._batches = batches
+
+    def add(self, batch):
+        return self._batches.append(batch)
+
+    def get(self, number):
+        return next(batch for batch in self._batches if batch.number == number)
+
+    def list(self):
+        return list(self._batches)
+
+
+class FakeBatchUnitOfWork(AbstractUnitOfWork):
+    def __init__(self):
+        self.repository = FakeBatchRepository([])
+        self.committed = False
 
     def commit(self):
         self.committed = True
 
-    def begin(self):
-        print("SESSION begin:")
+    def rollback(self):
+        pass
+
+
+def test_add_batch():
+    uow = FakeBatchUnitOfWork()
+    services.add_batch("b1", "СТОЛ", 10, None, uow=uow)
+    assert uow.repository.get("b1") is not None
+    assert uow.committed
 
 
 def test_allocations():
@@ -24,41 +46,36 @@ def test_allocations():
     today = date.today()
     tomorrow = today + timedelta(days=1)
 
-    fake_repo = FakeBatchRepository([])
-    fake_session = FakeSession()
     batch1 = dict(number="b1", sku="СТОЛ", qty=100, eta=today)
     batch2 = dict(number="b2", sku="СТОЛ", qty=100, eta=tomorrow)
-    services.add_batch(**batch2, repository=fake_repo, db_session=fake_session)
-    services.add_batch(**batch1, repository=fake_repo, db_session=fake_session)
+    uow = FakeBatchUnitOfWork()
+    services.add_batch(**batch2, uow=uow)
+    services.add_batch(**batch1, uow=uow)
 
-    batch_name = services.allocate(*line, repository=fake_repo, db_session=fake_session)
+    batch_name = services.allocate(*line, uow=uow)
     assert batch_name == "b1"
 
 
 def test_invalid_sku():
     line = ["o1", "СТОЛ", 10]
-    fake_repo = FakeBatchRepository([])
-    fake_session = FakeSession()
-    services.add_batch(
-        number="b1", sku="СТУЛ", qty=100, repository=fake_repo, db_session=fake_session
-    )
+
+    uow = FakeBatchUnitOfWork()
+    services.add_batch(number="b1", sku="СТУЛ", qty=100, eta=None, uow=uow)
 
     with pytest.raises(BatchException.InvalidSku, match=f"Недопустимый артикул СТОЛ"):
-        services.allocate(*line, repository=fake_repo, db_session=fake_session)
+        services.allocate(*line, uow=uow)
 
 
 def test_deallocate():
     line = ["o1", "СТОЛ", 10]
-    fake_repo, fake_session = FakeBatchRepository([]), FakeSession()
-    batch = services.add_batch(
-        number="b1", sku="СТОЛ", qty=100, repository=fake_repo, db_session=fake_session
-    )
+    uow = FakeBatchUnitOfWork()
+    batch = services.add_batch(number="b1", sku="СТОЛ", qty=100, eta=None, uow=uow)
 
-    batch_name = services.allocate(*line, repository=fake_repo, db_session=fake_session)
+    batch_name = services.allocate(*line, uow=uow)
     assert batch_name == "b1"
     assert batch.available_quantity == 90
 
-    services.deallocate(*line, batch, repository=fake_repo, db_session=fake_session)
+    services.deallocate(*line, batch, uow=uow)
     assert batch.available_quantity == 100
 
 
@@ -66,17 +83,14 @@ def test_deallocate_valid_sku():
     line1 = ["o1", "СТОЛ", 10]
     line2 = ["o2", "СТУЛ", 10]
 
-    fake_repo = FakeBatchRepository([])
-    fake_session = FakeSession()
-    services.add_batch(
-        number="b1", sku="СТОЛ", qty=100, repository=fake_repo, db_session=fake_session
-    )
+    uow = FakeBatchUnitOfWork()
+    services.add_batch(number="b1", sku="СТОЛ", qty=100, eta=None, uow=uow)
 
-    batch_name = services.allocate(*line1, repository=fake_repo, db_session=fake_session)
-    batch = fake_repo.get("b1")
+    batch_name = services.allocate(*line1, uow=uow)
+    batch = uow.repository.get("b1")
     assert batch_name == "b1"
     assert batch.available_quantity == 90
 
     with pytest.raises(BatchException.InvalidSku, match=f"Недопустимый артикул СТУЛ"):
-        services.deallocate(*line2, batch, fake_repo, fake_session)
+        services.deallocate(*line2, batch, uow=uow)
     assert batch.available_quantity == 90
