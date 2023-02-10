@@ -14,9 +14,10 @@ batches = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("number", String(255)),
-    Column("sku", String(256)),
+    Column("sku", ForeignKey("products.sku")),
     Column("qty", Integer),
     Column("eta", Date, nullable=True),
+    # Column("product_id", Integer),
 )
 
 allocations = Table(

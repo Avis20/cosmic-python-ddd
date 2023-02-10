@@ -1,22 +1,22 @@
-# src/app/core/batch/uow.py
+# src/app/core/product/uow.py
 
 from app.core.common.uow import AbstractUnitOfWork
 from app.models.db import session_factory
 
-from app.core.batch.repositories import BatchRepository
+from app.core.product.repositories import ProductRepository
 
 DEFAULT_SESSION_FACTORY = session_factory
 
 
-class BatchUnitOfWork(AbstractUnitOfWork):
-    repository: BatchRepository
+class ProductUnitOfWork(AbstractUnitOfWork):
+    repository: ProductRepository
 
     def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
         self.session_factory = session_factory
 
     def __enter__(self):
         self.session = self.session_factory()
-        self.repository = BatchRepository(self.session)
+        self.repository = ProductRepository(self.session)
         return super().__enter__()
 
     def __exit__(self, *args):
@@ -28,3 +28,4 @@ class BatchUnitOfWork(AbstractUnitOfWork):
 
     def commit(self):
         self.session.commit()
+

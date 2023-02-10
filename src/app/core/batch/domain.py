@@ -56,13 +56,3 @@ class BatchDomain:
 
     def can_allocate(self, order_line: OrderLineDomain):
         return self.sku == order_line.sku and self.available_quantity >= order_line.qty
-
-
-def allocate(order_line: OrderLineDomain, batches: List[BatchDomain]) -> str:
-    try:
-        batch = next(b for b in sorted(batches) if b.can_allocate(order_line))
-    except StopIteration:
-        raise BatchException.OutOfStock
-
-    batch.allocate(order_line)
-    return batch.number

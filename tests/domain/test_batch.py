@@ -64,8 +64,8 @@ def test_allocate_is_idempotent():
 
 
 def test_order_batches_by_eta():
-    batch_in_stock = BatchDomain("batch-in-stock", "RETRO-CLOCK", qty=100, eta=date.today())
     tomorrow = date.today() + timedelta(days=1)
+    batch_in_stock = BatchDomain("batch-in-stock", "RETRO-CLOCK", qty=100, eta=date.today())
     batch_in_shipment = BatchDomain("batch-in-shipment", "RETRO-CLOCK", qty=100, eta=tomorrow)
 
     batches = sorted([batch_in_shipment, batch_in_stock])

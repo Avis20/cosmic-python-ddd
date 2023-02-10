@@ -18,6 +18,13 @@ def db_in_memory():
 
 
 @pytest.fixture
+def session_factory(db_in_memory):
+    # start_mapper
+    yield sessionmaker(bind=db_in_memory)
+    clear_mappers()
+
+
+@pytest.fixture
 def session(db_in_memory) -> Session:
     Session = sessionmaker(bind=db_in_memory)
     session = Session()
