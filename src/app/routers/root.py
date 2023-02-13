@@ -39,3 +39,15 @@ def add_batch(
     product_service = ProductService()
     product_service.add_batch(**batch.dict(), uow=uow)
     return {"success": 1}
+
+@router.get('/batch/get')
+def get_batch(
+    sku: str,
+):
+    uow = ProductUnitOfWork()
+    product_service = ProductService()
+    batch = product_service.get_batch(sku, uow=uow)
+    # print('\n\n')
+    # print(repr(batch))
+    # print('\n\n')
+    return {"success": 1}

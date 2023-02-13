@@ -13,12 +13,12 @@ products = Table(
     "products",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column(
-        "sku",
-        String(256),
-    ),
+    Column("sku", String(256)),
+    Column("version_number", Integer, nullable=False, server_default="0"),
 )
 
 product_mapper = mapper_registry.map_imperatively(
-    ProductDomain, products, properties={"batches": relationship(batch_mapper, lazy='noload')}, 
+    # ProductDomain, products, properties={"batches": relationship(batch_mapper, lazy='noload')}, 
+    ProductDomain, products, properties={"batches": relationship(batch_mapper, lazy='select')}, 
+    # ProductDomain, products, properties={"batches": relationship(batch_mapper)}, 
 )

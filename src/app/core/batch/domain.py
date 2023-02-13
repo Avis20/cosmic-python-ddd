@@ -19,13 +19,19 @@ class BatchDomain:
     # словарь товарных позиций
     _allocations: Set[OrderLineDomain] = field(default_factory=set)
 
+    # def __repr__(self):
+    #     return f"<Batch {self.number}>"
+
+    # def __str__(self):
+    #     return self.number
+
     def __eq__(self, other):
         if isinstance(other, BatchDomain):
             return self.number == other.number
         return NotImplemented
 
-    # def __hash__(self):
-    #     return hash(self.number)
+    def __hash__(self):
+        return hash(self.number)
 
     def __gt__(self, other):
         if isinstance(other, BatchDomain):
@@ -48,6 +54,9 @@ class BatchDomain:
 
     @property
     def allocated_quantity(self) -> int:
+        print('\n\n _allocations')
+        print(self._allocations)
+        print('\n\n')
         return sum(line.qty for line in self._allocations)
 
     @property

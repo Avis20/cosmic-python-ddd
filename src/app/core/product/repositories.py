@@ -14,4 +14,4 @@ class ProductRepository(AbstractRepository):
         self.session.add(product)
 
     def get(self, sku: str) -> ProductDomain | None:
-        return self.session.query(ProductDomain).filter_by(sku=sku).first()
+        return self.session.query(ProductDomain).filter_by(sku=sku).with_for_update().first()

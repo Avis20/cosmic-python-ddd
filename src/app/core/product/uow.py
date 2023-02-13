@@ -21,11 +21,15 @@ class ProductUnitOfWork(AbstractUnitOfWork):
 
     def __exit__(self, *args):
         super().__exit__(*args)
+        # self.session.expunge_all()
         self.session.close()
 
     def rollback(self):
+        # sqlalchemy.orm.exc.DetachedInstanceError: Instance <BatchDomain at 0x7fbf4b17d960> is not bound to a Session; attribute refresh operation cannot proceed
+        self.session.expunge_all()
         self.session.rollback()
 
     def commit(self):
+        # self.session.expunge_all()
         self.session.commit()
 

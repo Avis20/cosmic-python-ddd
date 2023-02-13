@@ -12,11 +12,23 @@ from app.core.order_lines.domain import OrderLineDomain
 
 
 class ProductService:
+
+    def get_batch(self, sku, uow: ProductUnitOfWork) -> BatchDomain | None:
+        batch = None
+        with uow:
+            product = uow.repository.get(sku)
+            if product:
+                batch = product.get_batch(sku)
+        return batch
+
     def add_batch(
         self, number: str, sku: str, qty: int, eta: Optional[date], uow: ProductUnitOfWork
     ):
         """Добавление партии продукта"""
         batch = BatchDomain(number, sku, qty, eta)
+        print('\n\n batch')
+        print(batch)
+        print('\n\n')
         with uow:
             product = uow.repository.get(sku)
             if not product:
