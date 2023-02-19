@@ -1,4 +1,3 @@
-
 # ./tests/app/core/batch/test_services.py
 
 import pytest

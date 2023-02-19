@@ -8,7 +8,6 @@ RUN poetry install
 
 RUN mkdir /src
 COPY ./src /src
-COPY ./tests /tests
 RUN pip install -e /src
 
 WORKDIR /src

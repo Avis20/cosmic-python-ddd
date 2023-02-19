@@ -41,7 +41,7 @@ def add_stock(session: Session):
     batches_added = set()
     sku_added = set()
 
-    def _add_stock(lines):
+    def _add_stock(lines, version=None):
         for batch, sku, qty, eta in lines:
             [[batch_id]] = session.execute(
                 'INSERT INTO batches ("number", "sku", "qty", "eta") '
@@ -50,6 +50,13 @@ def add_stock(session: Session):
             )
             batches_added.add(batch_id)
             sku_added.add(sku)
+        if version is not None:
+            for sku in sku_added:
+                session.execute(
+                    'INSERT INTO products ("sku", "version_number") '
+                    'VALUES (:sku, :version)',
+                    dict(sku=sku, version=version)
+                )
         session.commit()
 
     yield _add_stock
@@ -70,4 +77,6 @@ def add_stock(session: Session):
         session.execute(
             'DELETE FROM order_lines WHERE sku = :sku', dict(sku=sku)
         )
-
+        session.execute(
+            'DELETE FROM products WHERE sku = :sku', dict(sku=sku)
+        )
