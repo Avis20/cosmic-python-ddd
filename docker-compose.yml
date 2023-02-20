@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+
+  cosmic-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - cosmic-db
+    env_file: .docker.env
+    volumes:
+      - ./src:/src
+    ports:
+      - 5000:5000
+    networks:
+      local:
+        ipv4_address: "192.168.201.1"
+
+  cosmic-db:
+    image: postgres:13
+    restart: unless-stopped
+    env_file: .docker.env
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data/
+    networks:
+      local:
+        ipv4_address: "192.168.201.2"
+
+  cosmic-db_migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .docker.env
+    command: "poetry run alembic upgrade head"
+    # command: "sleep infinity"
+    depends_on:
+      - cosmic-db
+    volumes:
+      - ./src:/src
+    networks:
+      local:
+        ipv4_address: "192.168.201.3"
+
+volumes:
+  db:
+
+networks:
+  local:
+    name: cosmic_network
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.201.0/20"
